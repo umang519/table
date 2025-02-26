@@ -135,7 +135,7 @@ export default function UserPage() {
   return (
     <Container>
       <Typography variant="h4" sx={{ color: "black" }} gutterBottom>
-        Users under: {traineeName}
+        Users under this : {traineeName}
       </Typography>
 
       {/* Add User Button */}
