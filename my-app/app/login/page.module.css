@@ -1,0 +1,117 @@
+
+  .page {
+    background-color: #007bff; /* Softer blue for the background */
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: Arial, sans-serif;
+  }
+  
+  .title {
+    color: black;
+    font-size: 2 rem;
+    position: absolute;
+    padding-bottom: 30px;
+   
+  }
+  
+  .container {
+    background: white;
+    padding: 2rem 2.5rem;
+    border-radius: 15px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    max-width: 400px;
+    width: 100%;
+  }
+  
+  .image {
+    width: 100%;
+    border-radius: 10px;
+    max-width: 400px;  /* Adjust the image size as needed */
+    margin-bottom: 20px;  /* Add space between image and form */
+  }
+  
+  .form {
+    width: 100%;
+  max-width: 400px;
+  }
+  
+  .inputContainer {
+    margin-bottom: 20px;
+    text-align: left;
+    position: relative;
+  }
+  
+  .input {
+    width: 100%;
+    padding: 12px 40px 12px 12px; /* Proper spacing for the icon */
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1rem;
+    transition: border-color 0.3s;
+  }
+  
+  .input:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+  }
+  
+  .icon {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: gray;
+  }
+  
+  .button {
+    width: 100%;
+    padding: 12px;
+    background: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    margin-top: 1rem; /* Add spacing from inputs */
+  }
+  
+  .button:hover {
+    background: #0056b3;
+  }
+  
+  .button:active {
+    transform: scale(0.98);
+  }
+ 
+  .error {
+    color: red;
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    padding: 8px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+  }
+  .signupLink {
+    text-align: center;
+    margin-top: 15px;
+    font-size: 14px;
+    color: #333;
+  }
+  
+  .link {
+    color: #1976d2;
+    cursor: pointer;
+    text-decoration: underline;
+  }
+  
+  .link:hover {
+    color: #1565c0;
+  }
+  
