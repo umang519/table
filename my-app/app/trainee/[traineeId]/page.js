@@ -1,6 +1,6 @@
 "use client";
-import { useState } from "react";
-import { useParams, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import {
   Container,
   Typography,
@@ -24,8 +24,10 @@ import {
   useUpdateUserMutation,
   useDeleteUserMutation,
 } from "@/app/redux/userApi";
+import Cookies from "js-cookie";
 
 export default function UserPage() {
+  const router = useRouter();
   const { traineeId } = useParams();
   const searchParams = useSearchParams();
   const traineeName = searchParams.get("traineeName") || "Loading...";
@@ -112,6 +114,25 @@ export default function UserPage() {
     setOpenDelete(true);
   };
 
+  const handleLogout = () => {
+        // Remove authentication cookies
+        Cookies.remove("authToken");
+        Cookies.remove("userRole");
+        Cookies.remove("userId");
+        Cookies.remove("adminId");
+        Cookies.remove("email");
+    
+        // Redirect to login page
+        router.push("/login");
+      };
+    
+      // Redirect to login if user is not authenticated
+      useEffect(() => {
+        const token = Cookies.get("authToken");
+        if (!token) {
+          router.push("/login");
+        }
+      }, []);
   // Close Delete Confirmation Dialog
   const handleCloseDelete = () => {
     setOpenDelete(false);
@@ -293,6 +314,10 @@ export default function UserPage() {
           </TableBody>
         </Table>
       </TableContainer>
+      
+      <div>
+        <Button variant="contained" sx= {{ mt : 2 }} onClick={handleLogout}>logout</Button>
+      </div>
     </Container>
   );
 }

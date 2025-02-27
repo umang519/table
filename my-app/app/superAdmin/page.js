@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useGetAdminsQuery, useAddAdminMutation, useDeleteAdminMutation, useUpdateAdminMutation} from "../redux/adminApi";
 import {
@@ -20,6 +20,7 @@ import {
   DialogActions,
 } from "@mui/material";
 import axios from "axios";
+import Cookies from "js-cookie";
 
 export default function SuperAdminPage() {
   const router = useRouter();
@@ -82,7 +83,26 @@ export default function SuperAdminPage() {
     }
   }
 
+  const handleLogout = () => {
+      // Remove authentication cookies
+      Cookies.remove("authToken");
+      Cookies.remove("userRole");
+      Cookies.remove("userId");
+      Cookies.remove("adminId");
+      Cookies.remove("email");
+
   
+      // Redirect to login page
+      router.push("/login");
+    };
+  
+    // Redirect to login if user is not authenticated
+    useEffect(() => {
+      const token = Cookies.get("authToken");
+      if (!token) {
+        router.push("/login");
+      }
+    }, []);
 
   return (
     <Container>
@@ -166,7 +186,7 @@ export default function SuperAdminPage() {
             {data?.admins.map((admin) => (
               <TableRow
                 key={admin._id}
-                onClick={() => router.push(`/superAdmin/${admin._id}?adminName=${encodeURIComponent(admin.username)}`)}
+                onClick={() => router.push(`/admin/${admin._id}?adminName=${encodeURIComponent(admin.username)}`)}
                 style={{ cursor: "pointer" }}
               >
                 <TableCell>{admin.username}</TableCell>
@@ -192,7 +212,9 @@ export default function SuperAdminPage() {
           </TableBody>
         </Table>
       </TableContainer>
-
+      <div>
+        <Button variant= "contained" sx= {{ mt : 2 }} onClick={handleLogout}>Logout</Button>
+      </div>
       
     </Container>
   );

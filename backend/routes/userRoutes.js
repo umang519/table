@@ -138,7 +138,7 @@ router.post("/trainees", async (req, res) => {
 router.get("/admins/:adminId/trainees", async (req, res) => {
   try {
     const { adminId } = req.params;
-    const trainees = await User.find({ role: "trainee", adminId });
+    const trainees = await User.find({ role: "trainee", adminId: adminId });
     res.json({ trainees });
   } catch (error) {
     res.status(500).json({ message: "Error fetching trainees" });
@@ -161,8 +161,12 @@ router.get("/trainees/:traineeId/users", async (req, res) => {
 
 router.get("/trainees", async (req, res) => {
   try {
-    const trainees = await User.find({ role: "trainee" }, "username email status adminId");
-
+    const { adminId } = req.query; // Extract adminId from query params
+    if (!adminId) {
+      return res.status(400).json({ message: "Admin ID is required" });
+    }
+    
+    const trainees = await User.find({ role: "trainee", adminId }, "username email status adminId");
     res.status(200).json({ trainees });
   } catch (error) {
     console.error("Error fetching trainees:", error);
@@ -294,7 +298,7 @@ router.delete("/trainees/:traineeId", async (req, res) => {
     }
   });
   
-  
+
 
   
 module.exports = router;

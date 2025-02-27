@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter, useParams, useSearchParams } from "next/navigation";
 import {
   Container,
@@ -24,14 +24,18 @@ import {
   useUpdateTraineeMutation,
   useDeleteTraineeMutation,
 } from "@/app/redux/traineeApi";
+import Cookies from "js-cookie";
 
 export default function AdminTraineesPage() {
   const { adminId } = useParams();
+  console.log(adminId);
   const searchParams = useSearchParams();
   const router = useRouter();
   const adminName = searchParams.get("adminName") || "Loading...";
 
   const { data, error, isLoading } = useGetTraineesQuery(adminId);
+  console.log("Fetching trainees for admin:", adminId);
+
   const [addTrainee] = useAddTraineeMutation();
   const [updateTrainee] = useUpdateTraineeMutation();
   const [deleteTrainee] = useDeleteTraineeMutation();
@@ -99,6 +103,27 @@ export default function AdminTraineesPage() {
     }
   };
 
+  const handleLogout = () => {
+    // Remove authentication cookies
+    Cookies.remove("authToken");
+    Cookies.remove("userRole");
+    Cookies.remove("userId");
+    Cookies.remove("adminId");
+    Cookies.remove("email");
+
+
+    // Redirect to login page
+    router.push("/login");
+  };
+
+  // Redirect to login if user is not authenticated
+  useEffect(() => {
+    const token = Cookies.get("authToken");
+    if (!token) {
+      router.push("/login");
+    }
+  }, []);
+
   return (
     <Container>
       <Typography variant="h4" sx={{ color: "black" }} gutterBottom>
@@ -133,7 +158,7 @@ export default function AdminTraineesPage() {
               data?.trainees.map((trainee) => (
                 <TableRow key={trainee._id} onClick={() =>
                   router.push(
-                    `/superAdmin/${adminId}/${trainee._id}?traineeName=${encodeURIComponent(
+                    `/trainee/${trainee._id}?traineeName=${encodeURIComponent(
                       trainee.username
                     )}`
                   )
@@ -175,6 +200,9 @@ export default function AdminTraineesPage() {
           </Button>
         </DialogActions>
       </Dialog>
+
+      <div><Button variant="contained" sx= {{ mt : 2 }} onClick={handleLogout}> logout </Button></div>
+
     </Container>
   );
 }

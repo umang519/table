@@ -43,13 +43,25 @@ export default function Login() {
         if (response.ok) {
           console.log("Login response:", data);
           Cookies.set("authToken", data.token, { expires: 7 }); // Store token
-          
+          Cookies.set("userRole", data.user.role, { expires: 7 });
+          Cookies.set("userId", data.user._id, { expires: 7 });
+          Cookies.set("email", data.user.email, { expires: 7 });
+          Cookies.set("username", data.user.username, { expires: 7});
+          Cookies.set("password", data.user.password, {expires: 7});
+
+          // Store user ID
+          if (data.user.role === "admin") {
+            Cookies.set("adminId", data.user.adminId, { expires: 7 }); // Store admin ID
+          }
+
           if (data.user.role === "superadmin") {
-            router.push("/superAdmin"); // Superadmin manages admins
+            router.push("/superAdmin");
           } else if (data.user.role === "admin") {
-            router.push("/adminHomePage"); // Admin manages users
+            router.push(`/admin/${data.id}`);
+          } else if (data.user.role === "trainee") {
+            router.push(`/trainee/${data.id}`);
           } else {
-            router.push("/userHomePage"); // Regular users go here
+            router.push("/userHomePage");
           }
         } else {
           setErrorMessage(data.message || "Invalid Credentials");

@@ -7,7 +7,10 @@ export const traineeApi = createApi({
   
   endpoints: (builder) => ({
     getTrainees: builder.query({
-      query: (adminId) => `/admins/${adminId}/trainees`,
+      query: (adminId) => {
+        if (!adminId) throw new Error("Admin ID is required");
+        return `/trainees?adminId=${adminId}`;
+      },
       providesTags: ["Trainees"],
     }),
 

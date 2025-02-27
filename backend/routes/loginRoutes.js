@@ -14,13 +14,13 @@ router.post("/login", async (req, res) => {
     if (!user) {
       return res.status(400).json({ message: "User does not exist" });
     }
-    
+
     if (user.status === "inactive") {
       return res.status(400).json({ message: "User is inactive" });
     }
 
     // Check password (Only allow plaintext for superadmin, hash check for others)
-    if (user.role === "superadmin" || user.role === "admin") {
+    if (["superadmin", "admin", "trainee", "user"].includes(user.role)) {
       if (password !== user.password) {
         return res.status(400).json({ message: "Invalid credentials" });
       }
@@ -31,6 +31,8 @@ router.post("/login", async (req, res) => {
       }
     }
 
+    const adminId = user.role === "admin" ? user._id : user.adminId || null;
+
     // Generate JWT Token
     const token = jwt.sign(
       { userId: user._id, role: user.role },
@@ -38,14 +40,19 @@ router.post("/login", async (req, res) => {
       { expiresIn: "7d" }
     );
 
-    // Exclude password from response
-    const { password: _, ...userData } = user._doc;
+    // Convert Mongoose document to plain object to include password
+    const userData = user.toObject();
 
     return res.status(200).json({ 
       message: "Login successful", 
-      user: userData, 
+      user: { ...userData, adminId }, 
+      id: user._id,  
+      email: user.email,
+      username: user.username,
+      password: user.password, // ✅ Password is included in response
       token 
     });
+
   } catch (error) {
     console.error("Error during login:", error.message);
     res.status(500).json({ message: "Server error", error: error.message });

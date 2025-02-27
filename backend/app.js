@@ -6,6 +6,7 @@ const loginRoutes = require('./routes/loginRoutes');
 const signupRoutes = require('./routes/signupRoutes');
 const addUser = require('./routes/addUser');
 const adminRoutes = require('./routes/adminRoutes');
+const profileRoutes = require("./routes/profileRoutes");
 const cors = require('cors');  // Import the login route
 
 require('dotenv').config();
@@ -31,6 +32,7 @@ app.use('/api', loginRoutes);
 app.use('/api', signupRoutes);
 app.use('/api', addUser);
 app.use('/api', adminRoutes);
+app.use("/api/profile", profileRoutes);
 
 app.get('/', (req, res) => {
   res.send('🔥 MongoDB Connection Successful!');
