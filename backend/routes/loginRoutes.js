@@ -14,6 +14,10 @@ router.post("/login", async (req, res) => {
     if (!user) {
       return res.status(400).json({ message: "User does not exist" });
     }
+    
+    if (user.resetToken && user.tokenExpiration > Date.now()) {
+      return res.status(400).json({ message: "Password reset pending. Please reset your password before logging in." });
+    }
 
     if (user.status === "inactive") {
       return res.status(400).json({ message: "User is inactive" });

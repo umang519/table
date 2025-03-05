@@ -137,6 +137,14 @@ export default function Login() {
             />
           </div>
 
+          <p
+            className={styles.forgotPassword}
+            onClick={() => router.push("/forgot-password")}
+          >
+            Forgot Password?
+          </p>
+
+
           {/* Error Message */}
           {errorMessage && <div className={styles.error}>{errorMessage}</div>}
 

@@ -115,3 +115,14 @@
     color: #1565c0;
   }
   
+  .forgotPassword {
+    text-align: right;
+    color: blue;
+    cursor: pointer;
+    margin-top: 5px;
+    font-size: 14px;
+  }
+  .forgotPassword:hover {
+    text-decoration: underline;
+  }
+  

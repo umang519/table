@@ -1,5 +1,6 @@
 // app.js (or your main server file)
 const express = require('express');
+const bodyParser = require("express").json;
 const connectDB = require('./db/connect');
 const userRoutes = require('./routes/userRoutes');
 const loginRoutes = require('./routes/loginRoutes');
@@ -19,6 +20,7 @@ connectDB();
 
 //enable cors
 app.use(cors());
+app.use(bodyParser());
 
 // Middleware
 app.use(express.json());
@@ -37,6 +39,7 @@ app.use("/api/profile", profileRoutes);
 app.get('/', (req, res) => {
   res.send('🔥 MongoDB Connection Successful!');
 });
+
 
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);

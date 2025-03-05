@@ -156,7 +156,8 @@ export default function UserPage() {
   return (
     <Container>
       <Typography variant="h4" sx={{ color: "black" }} gutterBottom>
-        Users under this : {traineeName}
+        Users under this : chess
+        {/* {traineeName} */}
       </Typography>
 
       {/* Add User Button */}
@@ -282,6 +283,7 @@ export default function UserPage() {
               <TableCell>Email</TableCell>
               <TableCell>Password</TableCell>
               <TableCell>Status</TableCell>
+              <TableCell>progressStatus</TableCell>
               <TableCell>Action</TableCell>
             </TableRow>
           </TableHead>
@@ -292,6 +294,7 @@ export default function UserPage() {
                 <TableCell>{user.email}</TableCell>
                 <TableCell>{user.password}</TableCell>
                 <TableCell>{user.status}</TableCell>
+                <TableCell>{user.progressStatus}</TableCell>
                 <TableCell>
                   <Button
                     variant="contained"
