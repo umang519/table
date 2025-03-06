@@ -33,10 +33,10 @@ const transporter = nodemailer.createTransport({
 //ADD USER & SEND INVITATION EMAIL
 router.post("/trainees/:traineeId/users", async (req, res) => {
   try {
-    const { username, email, password } = req.body;
+    const { username, email } = req.body;
     const { traineeId } = req.params;
 
-    if (!username || !email || !password) {
+    if (!username || !email ) {
       return res.status(400).json({ message: "All fields are required" });
     }
 
@@ -50,7 +50,7 @@ router.post("/trainees/:traineeId/users", async (req, res) => {
     const newUser = new User({
       username,
       email,
-      password,
+      password: "",
       role: "user",
       traineeId,
       status: "active",
@@ -71,7 +71,7 @@ router.post("/trainees/:traineeId/users", async (req, res) => {
       html: `<p>Hello <b>${username}</b>,</p>
            <p>Your account has been successfully created.</p>
            <p><b>Email:</b> ${email}</p>
-           <p><b>Password:</b> ${password}</p>
+           
            <p>Before logging in, please reset your password using the button below:</p>
            <p>
           <a href="${resetLink}" 
@@ -139,7 +139,7 @@ router.post("/accept-invitation", async (req, res) => {
 
 // RESET PASSWORD 
 router.post("/reset-password", async (req, res) => {
-  const { token, oldPassword, newPassword } = req.body;
+  const { token, newPassword, confirmPassword } = req.body;
 
   try {
     // Verify JWT token
@@ -151,14 +151,14 @@ router.post("/reset-password", async (req, res) => {
       return res.status(400).json({ message: "Invalid or expired token." });
     }
 
-    // Validate old password
-    if (user.password !== oldPassword) {
-      return res.status(400).json({ message: "Old password is incorrect." });
+    // Check if the password was already set
+    if (user.password && user.progressStatus === "Password Changed") {
+      return res.status(400).json({ message: "Password is already set. Use Forgot Password instead." });
     }
 
-    // Ensure new password is different
-    if (oldPassword === newPassword) {
-      return res.status(400).json({ message: "New password must be different." });
+    // Validate new password and confirm password
+    if (newPassword !== confirmPassword) {
+      return res.status(400).json({ message: "Passwords do not match." });
     }
 
     // Update password and progress status
@@ -168,12 +168,13 @@ router.post("/reset-password", async (req, res) => {
 
     await user.save();
 
-    res.json({ message: "Password successfully updated. You can now login." });
+    res.json({ message: "Password successfully updated. You can now log in." });
   } catch (error) {
     console.error("Error resetting password:", error);
     res.status(400).json({ message: "Invalid or expired token." });
   }
 });
+
 
 router.post("/forgot-password", async (req, res) => {
   const { email } = req.body;

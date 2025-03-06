@@ -23,7 +23,7 @@ export default function Login() {
     email: Yup.string()
       .email("Invalid email format")
       .required("Email is required"),
-    password: Yup.string().required("Password is required"),
+    password: Yup.string(),
   });
 
   // Formik setup
@@ -59,12 +59,23 @@ export default function Login() {
           } else if (data.user.role === "admin") {
             router.push(`/admin/${data.id}`);
           } else if (data.user.role === "trainee") {
-            router.push(`/trainee/${data.id}`);
-          } else {
+            if (data.user.id) {  // Use trainee's own ID instead of adminId
+              router.push(`/trainee/${data.user.id}?traineeName=${encodeURIComponent(data.user.username)}`);
+            } else {
+              console.error("Trainee ID is missing:", data.user);
+              setErrorMessage("Error: Trainee ID not found.");
+            }
+          }
+          
+           else {
             router.push("/userHomePage");
           }
         } else {
-          setErrorMessage(data.message || "Invalid Credentials");
+          if (data.message === "Please check your email and reset your password before logging in.") {
+            setErrorMessage("Your password has not been set. Please check your email and reset your password.");
+          } else {
+            setErrorMessage(data.message || "Invalid Credentials");
+          }
         }
       } catch (error) {
         console.error("Login error:", error);

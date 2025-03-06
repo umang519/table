@@ -9,8 +9,8 @@ export default function ResetPasswordPage() {
   const router = useRouter();
   const token = searchParams.get("token");
 
-  const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [validToken, setValidToken] = useState(true);
@@ -34,11 +34,17 @@ export default function ResetPasswordPage() {
     e.preventDefault();
     setLoading(true);
 
+    if (newPassword !== confirmPassword) {
+      setMessage("Passwords do not match.");
+      setLoading(false);
+      return;
+    }
+
     try {
       const response = await axios.post("http://localhost:5000/api/reset-password", {
         token,
-        oldPassword,
         newPassword,
+        confirmPassword,
       });
 
       setMessage(response.data.message);
@@ -55,22 +61,13 @@ export default function ResetPasswordPage() {
 
   return (
     <Container maxWidth="sm" style={{ marginTop: "50px", textAlign: "center" }}>
-      <Typography variant="h5" sx = {{ color: "black" }} gutterBottom>
+      <Typography variant="h5" sx={{ color: "black" }} gutterBottom>
         Reset Password
       </Typography>
       {message && <Typography color="error">{message}</Typography>}
       
       {validToken && (
         <form onSubmit={handleSubmit}>
-          <TextField
-            label="Old Password"
-            type="password"
-            fullWidth
-            margin="normal"
-            value={oldPassword}
-            onChange={(e) => setOldPassword(e.target.value)}
-            required
-          />
           <TextField
             label="New Password"
             type="password"
@@ -80,12 +77,21 @@ export default function ResetPasswordPage() {
             onChange={(e) => setNewPassword(e.target.value)}
             required
           />
+          <TextField
+            label="Confirm Password"
+            type="password"
+            fullWidth
+            margin="normal"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            required
+          />
           <Button
             type="submit"
             variant="contained"
             color="primary"
             fullWidth
-            disabled={!oldPassword || !newPassword || loading}
+            disabled={!newPassword || !confirmPassword || loading}
             style={{ marginTop: "20px" }}
           >
             {loading ? "Resetting..." : "Reset Password"}

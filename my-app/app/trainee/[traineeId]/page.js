@@ -46,7 +46,6 @@ export default function UserPage() {
   const [newUser, setNewUser] = useState({
     username: "",
     email: "",
-    password: "",
   });
 
   // State for update user dialog
@@ -72,12 +71,12 @@ export default function UserPage() {
   // Handle Add User Submit
   const handleSubmitAdd = async () => {
     try {
-      await addUser({ traineeId, ...newUser }).unwrap();
-      console.log("User added successfully");
+      await addUser({ traineeId, username: newUser.username, email: newUser.email, password: newUser.password  }).unwrap();
       handleCloseAdd();
     } catch (error) {
-      console.error("Error adding user:", error);
+      console.error("Error adding user:", error?.data || error);
     }
+    
   };
 
   // Open Update User Dialog
@@ -190,7 +189,7 @@ export default function UserPage() {
             fullWidth
             margin="dense"
           />
-          <TextField
+          {/* <TextField
             label="Password"
             name="password"
             type="password"
@@ -198,7 +197,7 @@ export default function UserPage() {
             onChange={handleChangeAdd}
             fullWidth
             margin="dense"
-          />
+          /> */}
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseAdd} color="secondary">
@@ -292,7 +291,7 @@ export default function UserPage() {
               <TableRow key={user._id}>
                 <TableCell>{user.username}</TableCell>
                 <TableCell>{user.email}</TableCell>
-                <TableCell>{user.password}</TableCell>
+                <TableCell>{""}</TableCell>
                 <TableCell>{user.status}</TableCell>
                 <TableCell>{user.progressStatus}</TableCell>
                 <TableCell>
