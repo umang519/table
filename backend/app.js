@@ -18,12 +18,18 @@ const PORT = process.env.PORT || 10000;
 connectDB();
 
 // ✅ Fix CORS (Allow Frontend URL)
-app.use(cors({
-  origin: ["https://table-gamma-three.vercel.app"], // Frontend URL
-  methods: ["GET", "POST", "PUT", "DELETE"], // Allowed methods
-  allowedHeaders: ["Content-Type", "Authorization"], // Allowed headers
-  credentials: true // Allow cookies
-}));
+app.use(
+  cors({
+    origin: [
+      "https://table-6ckeja2cq-umangprajapati19504-gmailcoms-projects.vercel.app", // ✅ New frontend URL
+      "https://table-gamma-three.vercel.app", // ✅ Old frontend URL (if still needed)
+    ],
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true, // ✅ Allow cookies
+  })
+);
+
 
 
 // ✅ Middleware
