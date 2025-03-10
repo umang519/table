@@ -26,12 +26,14 @@ export default function Login() {
     password: Yup.string(),
   });
 
+
   // Formik setup
   const formik = useFormik({
     initialValues: { email: "", password: "" },
     validationSchema: validationSchema,
     onSubmit: async (values) => {
       try {
+        console.log("Backend URL:", process.env.NEXT_PUBLIC_BACKEND_URL);
         const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/login`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
