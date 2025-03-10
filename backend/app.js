@@ -19,9 +19,12 @@ connectDB();
 
 // ✅ Fix CORS (Allow Frontend URL)
 app.use(cors({
-    origin: "https://table-gamma-three.vercel.app",  // Your Vercel frontend URL
-    credentials: true
+  origin: ["https://table-gamma-three.vercel.app"], // Frontend URL
+  methods: ["GET", "POST", "PUT", "DELETE"], // Allowed methods
+  allowedHeaders: ["Content-Type", "Authorization"], // Allowed headers
+  credentials: true // Allow cookies
 }));
+
 
 // ✅ Middleware
 app.use(bodyParser.json());
