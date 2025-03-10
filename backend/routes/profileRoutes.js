@@ -1,19 +1,30 @@
+"use client";
+
 const express = require("express");
+const bcrypt = require("bcryptjs");
 const User = require("../models/User");
 const router = express.Router();
 
 // Update user profile
-router.put("/update/:userId", async (req, res) => {
-  const { userId } = req.params;
+router.put("/update", async (req, res) => {
+ 
   const { username, password } = req.body;
 
   try {
-    const updatedData = { username };
+
+    const updatedData = {};
+    if (username) updatedData.username = username;
+    
     if (password) {
-      updatedData.password = password; // Store as plain text if needed
+      const salt = await bcrypt.genSalt(10);
+      updatedData.password = await bcrypt.hash(password, salt);
     }
 
-    const updatedUser = await User.findByIdAndUpdate(userId, updatedData, { new: true });
+    const updatedUser = await User.findOneAndUpdate(
+      { username }, // Find user by username
+      updatedData,
+      { new: true } // Return updated user
+    );
 
     if (!updatedUser) {
       return res.status(404).json({ message: "User not found" });

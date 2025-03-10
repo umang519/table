@@ -9,6 +9,8 @@ const addUser = require('./routes/addUser');
 const adminRoutes = require('./routes/adminRoutes');
 const profileRoutes = require("./routes/profileRoutes");
 const cors = require('cors');  // Import the login route
+const cookieParser = require("cookie-parser");
+
 
 require('dotenv').config();
 
@@ -35,6 +37,7 @@ app.use('/api', signupRoutes);
 app.use('/api', addUser);
 app.use('/api', adminRoutes);
 app.use("/api/profile", profileRoutes);
+app.use(cookieParser()); 
 
 app.get('/', (req, res) => {
   res.send('🔥 MongoDB Connection Successful!');

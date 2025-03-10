@@ -191,7 +191,7 @@ export default function SuperAdminPage() {
               >
                 <TableCell>{admin.username}</TableCell>
                 <TableCell>{admin.email}</TableCell>
-                <TableCell>{admin.password}</TableCell>
+                <TableCell>{"****"}</TableCell>
                 <TableCell>{admin.status}</TableCell>
                 <TableCell>
                   <Button variant="contained" color="secondary" onClick={(e) => {

@@ -12,10 +12,13 @@ import {
 } from "@mui/material";
 import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
+import { useDispatch, useSelector } from "react-redux";
+import { setUser, updateUser } from "../redux/userSlice";
 
 export default function UserHomePage() {
   const router = useRouter();
-  const [user, setUser] = useState(null);
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state.user);
   const [editMode, setEditMode] = useState(false);
   const [updatedUser, setUpdatedUser] = useState({
     username: "",
@@ -29,16 +32,16 @@ export default function UserHomePage() {
       return;
     }
 
-    // Get user details from cookies
     const userId = Cookies.get("userId") || "";
     const userRole = Cookies.get("userRole") || "User";
     const email = Cookies.get("email") || "Not Available";
     const username = Cookies.get("username") || "User";
-    const password = Cookies.get("password") || "";
 
-    setUser({ userId, role: userRole, email, username, password });
-    setUpdatedUser({ username, password }); // Set initial form data
-  }, [router]);
+    if (userId) {
+      dispatch(setUser({ userId, role: userRole, email, username }));
+      setUpdatedUser({ username, password: "" });
+    }
+  }, [dispatch, router]);
 
   const handleLogout = () => {
     [
@@ -61,40 +64,41 @@ export default function UserHomePage() {
   };
 
   const handleSave = async () => {
-    console.log("Sending data to server:", { 
-      userId: user?.userId, 
-      username: updatedUser.username, 
-      password: updatedUser.password 
-    });
-  
+    console.log("User ID before request:", user?.userId); // Debugging
+
+    if (!user?.userId) {
+      console.error("User ID is missing!");
+      return;
+    }
+
+
+    const updatePayload = { username: updatedUser.username };
+    if (updatedUser.password.trim() !== "") {
+      updatePayload.password = updatedUser.password; // Only send password if it's changed
+    }
+
     try {
-      const response = await fetch(`http://localhost:5000/api/profile/update/${user.userId}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          userId: user.userId, // Ensure this is defined
-          username: updatedUser.username,
-          password: updatedUser.password,
-        }),
-      });
-  
-      const data = await response.json();
-      console.log("Server Response:", data);
-  
-      if (response.ok) {
-        setUser({ ...user, username: updatedUser.username });
-        Cookies.set("username", updatedUser.username);
-        alert("Profile updated successfully!");
-      } else {
-        alert(data.message);
+      const response = await fetch(
+        `http://localhost:5000/api/profile/update`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(updatePayload),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to update profile");
       }
+
+      dispatch(updateUser({ username: updatedUser.username}));
+      console.log("Profile updated successfully!");
     } catch (error) {
       console.error("Error updating profile:", error);
-      alert("Failed to update profile.");
     }
   };
-  
-  
 
   return (
     <div style={{ display: "flex", height: "100vh" }}>
@@ -130,7 +134,7 @@ export default function UserHomePage() {
           padding: 2,
         }}
       >
-        {user ? (
+        {user?.userId ? (
           <Card
             sx={{
               width: 400,
@@ -210,9 +214,6 @@ export default function UserHomePage() {
                   </Typography>
                   <Typography variant="body1" color="textSecondary">
                     Role: {user.role}
-                  </Typography>
-                  <Typography variant="body1" color="textSecondary">
-                    Password: {user.password}
                   </Typography>
                   <Button
                     variant="contained"

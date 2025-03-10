@@ -1,8 +1,9 @@
 const express = require("express");
 const router = express.Router();
 const crypto = require("crypto");
+const bcrypt = require("bcryptjs");
 const User = require("../models/User");
-const jwt = require("jsonwebtoken")
+const jwt = require("jsonwebtoken");
 const nodemailer = require("nodemailer");
 
 router.get("/users", async (req, res) => {
@@ -36,14 +37,16 @@ router.post("/trainees/:traineeId/users", async (req, res) => {
     const { username, email } = req.body;
     const { traineeId } = req.params;
 
-    if (!username || !email ) {
+    if (!username || !email) {
       return res.status(400).json({ message: "All fields are required" });
     }
 
     // Check if user already exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      return res.status(400).json({ message: "User with this email already exists" });
+      return res
+        .status(400)
+        .json({ message: "User with this email already exists" });
     }
 
     // Create new user
@@ -60,7 +63,9 @@ router.post("/trainees/:traineeId/users", async (req, res) => {
     await newUser.save();
 
     // Generate JWT Token (Valid for 5 Minutes)
-    const token = jwt.sign({ email: newUser.email }, "your_secret_key", { expiresIn: "5m" });
+    const token = jwt.sign({ email: newUser.email }, "your_secret_key", {
+      expiresIn: "5m",
+    });
 
     // Send Email with Reset Password Link
     const resetLink = `http://localhost:3000/reset-password?token=${token}`;
@@ -89,16 +94,31 @@ router.post("/trainees/:traineeId/users", async (req, res) => {
     transporter.sendMail(mailOptions, (err, info) => {
       if (err) {
         console.error("Email sending failed:", err);
-        return res.status(500).json({ success: false, message: "Email sending failed", error: err });
+        return res
+          .status(500)
+          .json({
+            success: false,
+            message: "Email sending failed",
+            error: err,
+          });
       }
       console.log("Email sent successfully:", info.response);
-      return res.json({ success: true, message: "User added successfully and email sent" });
+      return res.json({
+        success: true,
+        message: "User added successfully and email sent",
+      });
     });
 
     res.status(201).json({ message: "User added successfully", user: newUser });
   } catch (error) {
     console.error("Error adding user:", error);
-    res.status(500).json({ success: false, message: "Server error", error: error.toString() });
+    res
+      .status(500)
+      .json({
+        success: false,
+        message: "Server error",
+        error: error.toString(),
+      });
   }
 });
 
@@ -137,7 +157,7 @@ router.post("/accept-invitation", async (req, res) => {
   }
 });
 
-// RESET PASSWORD 
+// RESET PASSWORD
 router.post("/reset-password", async (req, res) => {
   const { token, newPassword, confirmPassword } = req.body;
 
@@ -153,7 +173,11 @@ router.post("/reset-password", async (req, res) => {
 
     // Check if the password was already set
     if (user.password && user.progressStatus === "Password Changed") {
-      return res.status(400).json({ message: "Password is already set. Use Forgot Password instead." });
+      return res
+        .status(400)
+        .json({
+          message: "Password is already set. Use Forgot Password instead.",
+        });
     }
 
     // Validate new password and confirm password
@@ -162,7 +186,9 @@ router.post("/reset-password", async (req, res) => {
     }
 
     // Update password and progress status
-    user.password = newPassword;
+    const salt = await bcrypt.genSalt(10);
+    user.password = await bcrypt.hash(newPassword, salt);
+
     user.progressStatus = "Password Changed";
     user.invitationAccepted = true;
 
@@ -176,6 +202,7 @@ router.post("/reset-password", async (req, res) => {
 });
 
 
+
 router.post("/forgot-password", async (req, res) => {
   const { email } = req.body;
 
@@ -186,27 +213,32 @@ router.post("/forgot-password", async (req, res) => {
       return res.status(404).json({ message: "User does not exist." });
     }
 
-    let passwordToSend;
-
-    // Check the progress status to determine which password to send
     if (user.progressStatus === "Invitation Sent") {
-      return res.status(400).json({ message: "Invitation has been set check your email." });
-    } else if (user.progressStatus === "Invitation Accepted"){
+      return res.status(400).json({ message: "Invitation has been sent. Check your email." });
+    } else if (user.progressStatus === "Invitation Accepted") {
       return res.status(400).json({ message: "Invitation is not accepted. Accept first through your mail." });
     }
-    else if (user.progressStatus === "Password Not Set") {
-      // Generate a new random password
-      passwordToSend = crypto.randomBytes(4).toString("hex");
-      user.password = passwordToSend;
-      user.progressStatus = "Password Changed"; // Mark as changed
-      await user.save();
-    } else if (user.progressStatus === "Password Changed") {
-      passwordToSend = user.password; // Send existing password
-    } else {
-      return res.status(400).json({ message: "Invalid user status." });
+
+    // ✅ Generate a new random password
+    const newPassword = crypto.randomBytes(4).toString("hex");
+
+    // ✅ Hash the new password before saving
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    // ✅ Update user's password and progress status
+    user.password = hashedPassword;
+    user.progressStatus = "Password Changed";
+    
+    // ✅ Ensure the password is updated in the database
+    await user.save();
+
+    // ✅ Verify if the password is successfully updated
+    const updatedUser = await User.findOne({ email });
+    if (!updatedUser || !(await bcrypt.compare(newPassword, updatedUser.password))) {
+      return res.status(500).json({ message: "Error updating password. Try again." });
     }
 
-    // Send email with the correct password
+    // ✅ Send email with the new password
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
@@ -218,13 +250,13 @@ router.post("/forgot-password", async (req, res) => {
     const mailOptions = {
       from: "umangprajapati19504@gmail.com",
       to: email,
-      subject: "Your Password",
+      subject: "Your New Temporary Password",
       html: `
         <div style="font-family: Arial, sans-serif; text-align: center;">
-          <h2>Password Recovery</h2>
+          <h2>Password Reset</h2>
           <p>Hello,</p>
-          <p>Your password is: <strong>${passwordToSend}</strong></p>
-          <p>Click the button below to login:</p>
+          <p>Your new temporary password is: <strong>${newPassword}</strong></p>
+          <p>Please log in and change your password immediately.</p>
           <a href="http://localhost:3000/login" 
              style="display: inline-block; padding: 10px 20px; font-size: 16px; 
                     color: white; background-color: #007bff; text-decoration: none; 
@@ -238,12 +270,16 @@ router.post("/forgot-password", async (req, res) => {
 
     await transporter.sendMail(mailOptions);
 
-    res.json({ message: "Password has been sent to your email." });
+    res.json({ message: "A new password has been sent to your email. Please change it after logging in." });
+
   } catch (error) {
-    console.error("Error sending email:", error);
+    console.error("Error resetting password:", error);
     res.status(500).json({ message: "Internal Server Error" });
   }
 });
+
+
+
 
 router.get("/admins", async (req, res) => {
   if (req.query.role) {
@@ -277,11 +313,13 @@ router.post("/admins", async (req, res) => {
       return res.status(400).json.apply({ message: "Email already in use" });
     }
 
+    const hashedPassword = await bcrypt.hash(password, 10);
+
     //new admin
     const newAdmin = new User({
       username,
       email,
-      password,
+      password: hashedPassword,
       status: status || "active",
       role: "admin",
     });
@@ -315,11 +353,13 @@ router.post("/trainees", async (req, res) => {
         .json({ message: "Trainee with this email already exists" });
     }
 
+    const hashedPassword = await bcrypt.hash(password, 10);
+
     // Create new trainee
     const newTrainee = new User({
       username,
       email,
-      password,
+      password: hashedPassword,
       role: "trainee",
       adminId,
       status: "active",
@@ -367,7 +407,7 @@ router.get("/admins/:adminId/trainees", async (req, res) => {
 router.get("/trainees/:traineeId/users", async (req, res) => {
   try {
     const { traineeId } = req.params;
-    console.log("Fetching users for trainee:", traineeId); 
+    console.log("Fetching users for trainee:", traineeId);
 
     const users = await User.find({ role: "user", traineeId });
 

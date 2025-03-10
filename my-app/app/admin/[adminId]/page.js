@@ -165,7 +165,7 @@ export default function AdminTraineesPage() {
                 }>
                   <TableCell>{trainee.username}</TableCell>
                   <TableCell>{trainee.email}</TableCell>
-                  <TableCell>{trainee.password}</TableCell>
+                  <TableCell>{"****"}</TableCell>
                   <TableCell>{trainee.status}</TableCell>
                   <TableCell>
                     <Button variant="contained" color="secondary" onClick={(e) => {

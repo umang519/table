@@ -36,12 +36,18 @@ router.post("/login", async (req, res) => {
     
     const adminId = user.role === "trainee" ? user.adminId || "N/A" : user.role === "admin" ? user._id : null;
 
+    if (user.progressStatus === "Password Changed") {
+      user.progressStatus = "Login Completed";
+      await user.save(); // Save the updated progressStatus
+    }
+
     // Generate JWT Token
     const token = jwt.sign(
       { userId: user._id, role: user.role },
-      "your_secret_key",
+      "process.env.JWT_SECRET",
       { expiresIn: "7d" }
     );
+    
 
     return res.status(200).json({ 
       message: "Login successful", 
@@ -51,6 +57,7 @@ router.post("/login", async (req, res) => {
         username: user.username,
         role: user.role,
         adminId: user.adminId,
+        progressStatus: user.progressStatus,
       },  
       token 
     });

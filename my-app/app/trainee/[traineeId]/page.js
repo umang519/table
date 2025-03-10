@@ -155,7 +155,7 @@ export default function UserPage() {
   return (
     <Container>
       <Typography variant="h4" sx={{ color: "black" }} gutterBottom>
-        Users under this : chess
+        Users under this : {traineeName}
         {/* {traineeName} */}
       </Typography>
 
@@ -291,7 +291,7 @@ export default function UserPage() {
               <TableRow key={user._id}>
                 <TableCell>{user.username}</TableCell>
                 <TableCell>{user.email}</TableCell>
-                <TableCell>{""}</TableCell>
+                <TableCell>{"****"}</TableCell>
                 <TableCell>{user.status}</TableCell>
                 <TableCell>{user.progressStatus}</TableCell>
                 <TableCell>

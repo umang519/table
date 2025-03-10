@@ -42,7 +42,7 @@ export default function Login() {
 
         if (response.ok) {
           console.log("Login response:", data);
-          Cookies.set("authToken", data.token, { expires: 7 }); // Store token
+          Cookies.set("authToken", data.token, { expires: 7 }); 
           Cookies.set("userRole", data.user.role, { expires: 7 });
           Cookies.set("userId", data.user._id, { expires: 7 });
           Cookies.set("email", data.user.email, { expires: 7 });
@@ -51,15 +51,16 @@ export default function Login() {
 
           // Store user ID
           if (data.user.role === "admin") {
-            Cookies.set("adminId", data.user.adminId, { expires: 7 }); // Store admin ID
+            Cookies.set("adminId", data.user.adminId, { expires: 7 }); 
           }
 
           if (data.user.role === "superadmin") {
             router.push("/superAdmin");
           } else if (data.user.role === "admin") {
-            router.push(`/admin/${data.id}`);
-          } else if (data.user.role === "trainee") {
-            if (data.user.id) {  // Use trainee's own ID instead of adminId
+            router.push(`/admin/${data.user.id}?adminName=${encodeURIComponent(data.user.username)}`);
+          }
+          else if (data.user.role === "trainee") {
+            if (data.user.id) {  
               router.push(`/trainee/${data.user.id}?traineeName=${encodeURIComponent(data.user.username)}`);
             } else {
               console.error("Trainee ID is missing:", data.user);
@@ -86,7 +87,7 @@ export default function Login() {
 
   return (
     <div className={styles.page}>
-      <h1 className={styles.title}>Login</h1>
+      {/* <h1 className={styles.title}>Login</h1> */}
       <div className={styles.container}>
         <img
           src="https://static.vecteezy.com/system/resources/thumbnails/011/432/528/small/enter-login-and-password-registration-page-on-screen-sign-in-to-your-account-creative-metaphor-login-page-mobile-app-with-user-page-flat-illustration-vector.jpg"
@@ -152,7 +153,7 @@ export default function Login() {
             className={styles.forgotPassword}
             onClick={() => router.push("/forgot-password")}
           >
-            Forgot Password?
+            Forget Password?
           </p>
 
 

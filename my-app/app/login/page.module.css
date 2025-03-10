@@ -117,9 +117,10 @@
   
   .forgotPassword {
     text-align: right;
-    color: blue;
+    color: #1565c2;
     cursor: pointer;
     margin-top: 5px;
+    margin-bottom: 5px;
     font-size: 14px;
   }
   .forgotPassword:hover {
