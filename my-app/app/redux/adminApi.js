@@ -2,7 +2,7 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 export const adminApi = createApi({
   reducerPath: "adminApi",
-  baseQuery: fetchBaseQuery({ baseUrl: "http://localhost:5000/api" }),
+  baseQuery: fetchBaseQuery({ baseUrl: "https://table-uxu6.onrender.com/api" }),
   tagTypes: ["Admin"], // Enables automatic cache invalidation
 
   endpoints: (builder) => ({
