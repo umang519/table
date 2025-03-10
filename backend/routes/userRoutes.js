@@ -201,8 +201,6 @@ router.post("/reset-password", async (req, res) => {
   }
 });
 
-
-
 router.post("/forgot-password", async (req, res) => {
   const { email } = req.body;
 
@@ -277,9 +275,6 @@ router.post("/forgot-password", async (req, res) => {
     res.status(500).json({ message: "Internal Server Error" });
   }
 });
-
-
-
 
 router.get("/admins", async (req, res) => {
   if (req.query.role) {
