@@ -8,7 +8,7 @@ const signupRoutes = require('./routes/signupRoutes');
 const addUser = require('./routes/addUser');
 const adminRoutes = require('./routes/adminRoutes');
 const profileRoutes = require("./routes/profileRoutes");
-const cors = require('cors');  // Import the login route
+const cors = require('cors'); 
 const cookieParser = require("cookie-parser");
 
 
