@@ -1,13 +1,15 @@
 "use client";
-import { useState, useEffect } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
-import { TextField, Button, Typography, Container } from "@mui/material";
+import { Suspense, useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
+import { notFound } from "next/navigation"; // Ensure proper handling
 import axios from "axios";
+import { Container, Typography, TextField, Button } from "@mui/material";
 
-export default function ResetPasswordPage() {
+function ResetPasswordPage() {
   const searchParams = useSearchParams();
-  const router = useRouter();
   const token = searchParams.get("token");
+
+  if (!token) return notFound(); // Prevent static pre-rendering
 
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -16,18 +18,13 @@ export default function ResetPasswordPage() {
   const [validToken, setValidToken] = useState(true);
 
   useEffect(() => {
-    if (token) {
-      axios
-        .post("http://localhost:5000/api/accept-invitation", { token })
-        .then((res) => console.log(res.data.message))
-        .catch((err) => {
-          setMessage("Token expired or invalid.");
-          setValidToken(false);
-        });
-    } else {
-      setMessage("Invalid token.");
-      setValidToken(false);
-    }
+    axios
+      .post("http://localhost:5000/api/accept-invitation", { token })
+      .then((res) => console.log(res.data.message))
+      .catch(() => {
+        setMessage("Token expired or invalid.");
+        setValidToken(false);
+      });
   }, [token]);
 
   const handleSubmit = async (e) => {
@@ -48,10 +45,7 @@ export default function ResetPasswordPage() {
       });
 
       setMessage(response.data.message);
-
-      setTimeout(() => {
-        router.push("/login"); 
-      }, 3000);
+      setTimeout(() => (window.location.href = "/login"), 3000);
     } catch (error) {
       setMessage(error.response?.data?.message || "Error resetting password.");
     } finally {
@@ -65,7 +59,7 @@ export default function ResetPasswordPage() {
         Reset Password
       </Typography>
       {message && <Typography color="error">{message}</Typography>}
-      
+
       {validToken && (
         <form onSubmit={handleSubmit}>
           <TextField
@@ -99,5 +93,14 @@ export default function ResetPasswordPage() {
         </form>
       )}
     </Container>
+  );
+}
+
+// Use Suspense to wrap the component
+export default function Page() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <ResetPasswordPage />
+    </Suspense>
   );
 }
