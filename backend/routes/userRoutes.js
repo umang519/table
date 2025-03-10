@@ -276,60 +276,60 @@ router.post("/forgot-password", async (req, res) => {
   }
 });
 
-router.get("/admins", async (req, res) => {
-  if (req.query.role) {
-    filter.role = req.query.role;
-  }
+// router.get("/admins", async (req, res) => {
+//   if (req.query.role) {
+//     filter.role = req.query.role;
+//   }
 
-  try {
-    const admins = await User.find(
-      { role: "admin" },
-      "username email password status role"
-    );
+//   try {
+//     const admins = await User.find(
+//       { role: "admin" },
+//       "username email password status role"
+//     );
 
-    res.status(200).json({
-      admins,
-      totalAdmins: admins.length,
-    });
-  } catch (error) {
-    console.error("Error fetching admins:", error.message);
-    res
-      .status(500)
-      .json({ message: "Error fetching admins", error: error.message });
-  }
-});
+//     res.status(200).json({
+//       admins,
+//       totalAdmins: admins.length,
+//     });
+//   } catch (error) {
+//     console.error("Error fetching admins:", error.message);
+//     res
+//       .status(500)
+//       .json({ message: "Error fetching admins", error: error.message });
+//   }
+// });
 
-router.post("/admins", async (req, res) => {
-  try {
-    const { username, email, password, status } = req.body;
+// router.post("/admins", async (req, res) => {
+//   try {
+//     const { username, email, password, status } = req.body;
 
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      return res.status(400).json.apply({ message: "Email already in use" });
-    }
+//     const existingUser = await User.findOne({ email });
+//     if (existingUser) {
+//       return res.status(400).json.apply({ message: "Email already in use" });
+//     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+//     const hashedPassword = await bcrypt.hash(password, 10);
 
-    //new admin
-    const newAdmin = new User({
-      username,
-      email,
-      password: hashedPassword,
-      status: status || "active",
-      role: "admin",
-    });
+//     //new admin
+//     const newAdmin = new User({
+//       username,
+//       email,
+//       password: hashedPassword,
+//       status: status || "active",
+//       role: "admin",
+//     });
 
-    await newAdmin.save();
+//     await newAdmin.save();
 
-    res.status(201).json({
-      message: "admin added successfully",
-      admin: newAdmin,
-    });
-  } catch (error) {
-    console.error("Error addind admin: ", error);
-    res.status(500).json({ message: "server error", error: error.message });
-  }
-});
+//     res.status(201).json({
+//       message: "admin added successfully",
+//       admin: newAdmin,
+//     });
+//   } catch (error) {
+//     console.error("Error addind admin: ", error);
+//     res.status(500).json({ message: "server error", error: error.message });
+//   }
+// });
 
 router.post("/trainees", async (req, res) => {
   try {
