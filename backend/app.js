@@ -1,7 +1,7 @@
 // app.js (or your main server file)
 const express = require('express');
 const bodyParser = require("express").json;
-const connectDB = require('./db/connect');
+const connectDB = require('./db/connect'); //connect file
 const userRoutes = require('./routes/userRoutes');
 const loginRoutes = require('./routes/loginRoutes');
 const signupRoutes = require('./routes/signupRoutes');
