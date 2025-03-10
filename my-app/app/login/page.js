@@ -34,7 +34,7 @@ export default function Login() {
     onSubmit: async (values) => {
       try {
         console.log("Backend URL:", process.env.NEXT_PUBLIC_BACKEND_URL);
-        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/login`, {
+        const response = await fetch(`https://table-uxu6.onrender.com/api/login`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(values),
