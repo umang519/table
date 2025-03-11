@@ -68,7 +68,9 @@ router.post("/trainees/:traineeId/users", async (req, res) => {
     });
 
     // Send Email with Reset Password Link
-    const resetLink = `${process.env.FRONTEND_URL}/reset-password?token=${token}`;
+    const frontendUrl =
+      "https://table-git-main-umangprajapati19504-gmailcoms-projects.vercel.app";
+    const resetLink = `${frontendUrl}/reset-password?token=${token}`;
     const mailOptions = {
       from: "umangprajapati19504@gmail.com",
       to: email,
@@ -94,13 +96,11 @@ router.post("/trainees/:traineeId/users", async (req, res) => {
     transporter.sendMail(mailOptions, (err, info) => {
       if (err) {
         console.error("Email sending failed:", err);
-        return res
-          .status(500)
-          .json({
-            success: false,
-            message: "Email sending failed",
-            error: err,
-          });
+        return res.status(500).json({
+          success: false,
+          message: "Email sending failed",
+          error: err,
+        });
       }
       console.log("Email sent successfully:", info.response);
       return res.json({
@@ -112,13 +112,11 @@ router.post("/trainees/:traineeId/users", async (req, res) => {
     res.status(201).json({ message: "User added successfully", user: newUser });
   } catch (error) {
     console.error("Error adding user:", error);
-    res
-      .status(500)
-      .json({
-        success: false,
-        message: "Server error",
-        error: error.toString(),
-      });
+    res.status(500).json({
+      success: false,
+      message: "Server error",
+      error: error.toString(),
+    });
   }
 });
 
@@ -173,11 +171,9 @@ router.post("/reset-password", async (req, res) => {
 
     // Check if the password was already set
     if (user.password && user.progressStatus === "Password Changed") {
-      return res
-        .status(400)
-        .json({
-          message: "Password is already set. Use Forgot Password instead.",
-        });
+      return res.status(400).json({
+        message: "Password is already set. Use Forgot Password instead.",
+      });
     }
 
     // Validate new password and confirm password
@@ -212,9 +208,16 @@ router.post("/forgot-password", async (req, res) => {
     }
 
     if (user.progressStatus === "Invitation Sent") {
-      return res.status(400).json({ message: "Invitation has been sent. Check your email." });
+      return res
+        .status(400)
+        .json({ message: "Invitation has been sent. Check your email." });
     } else if (user.progressStatus === "Invitation Accepted") {
-      return res.status(400).json({ message: "Invitation is not accepted. Accept first through your mail." });
+      return res
+        .status(400)
+        .json({
+          message:
+            "Invitation is not accepted. Accept first through your mail.",
+        });
     }
 
     // ✅ Generate a new random password
@@ -226,14 +229,19 @@ router.post("/forgot-password", async (req, res) => {
     // ✅ Update user's password and progress status
     user.password = hashedPassword;
     user.progressStatus = "Password Changed";
-    
+
     // ✅ Ensure the password is updated in the database
     await user.save();
 
     // ✅ Verify if the password is successfully updated
     const updatedUser = await User.findOne({ email });
-    if (!updatedUser || !(await bcrypt.compare(newPassword, updatedUser.password))) {
-      return res.status(500).json({ message: "Error updating password. Try again." });
+    if (
+      !updatedUser ||
+      !(await bcrypt.compare(newPassword, updatedUser.password))
+    ) {
+      return res
+        .status(500)
+        .json({ message: "Error updating password. Try again." });
     }
 
     // ✅ Send email with the new password
@@ -268,8 +276,10 @@ router.post("/forgot-password", async (req, res) => {
 
     await transporter.sendMail(mailOptions);
 
-    res.json({ message: "A new password has been sent to your email. Please change it after logging in." });
-
+    res.json({
+      message:
+        "A new password has been sent to your email. Please change it after logging in.",
+    });
   } catch (error) {
     console.error("Error resetting password:", error);
     res.status(500).json({ message: "Internal Server Error" });
