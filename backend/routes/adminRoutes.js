@@ -23,13 +23,11 @@ router.post("/admins", async (req, res) => {
       return res.status(400).json({ message: "Email already exists" });
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
-
     // Create new admin (without hashing password)
     const newAdmin = new User({
       username,
       email,
-      password: hashedPassword,
+      password,
       role: "admin",
       signupMethod: "admin",
       status: "active"
