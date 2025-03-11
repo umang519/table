@@ -255,7 +255,7 @@ router.post("/forgot-password", async (req, res) => {
           <p>Hello,</p>
           <p>Your new temporary password is: <strong>${newPassword}</strong></p>
           <p>Please log in and change your password immediately.</p>
-          <a href="http://localhost:3000/login" 
+          <a href="${process.env.FRONTEND_URL}/login"
              style="display: inline-block; padding: 10px 20px; font-size: 16px; 
                     color: white; background-color: #007bff; text-decoration: none; 
                     border-radius: 5px;">
