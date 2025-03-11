@@ -21,6 +21,7 @@ connectDB();
 app.use(
   cors({
     origin: [
+      "https://table-git-main-umangprajapati19504-gmailcoms-projects.vercel.app",
       "https://table-6ckeja2cq-umangprajapati19504-gmailcoms-projects.vercel.app", // ✅ New frontend URL
       "https://table-gamma-three.vercel.app", // ✅ Old frontend URL (if still needed)
     ],
