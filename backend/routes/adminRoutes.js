@@ -23,11 +23,13 @@ router.post("/admins", async (req, res) => {
       return res.status(400).json({ message: "Email already exists" });
     }
 
+    const hashedPassword = await bcrypt.hash(password, 10);
+
     // Create new admin (without hashing password)
     const newAdmin = new User({
       username,
       email,
-      password,
+      password: hashedPassword,
       role: "admin",
       signupMethod: "admin",
       status: "active"
@@ -44,10 +46,15 @@ router.post("/admins", async (req, res) => {
 router.put("/admins/:id", async (req, res) => {
   try {
     const { username, email, password, status } = req.body;
+    let updateData = { username, email, status};
+
+    if(password) {
+      updateData.password = await bcrypt.hash(password, 10);
+    }
 
     const updatedAdmin = await User.findByIdAndUpdate(
       req.params.id,
-      { username, email, password, status },
+      updateData,
       { new: true }
     );
 
