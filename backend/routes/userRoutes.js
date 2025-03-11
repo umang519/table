@@ -68,7 +68,7 @@ router.post("/trainees/:traineeId/users", async (req, res) => {
     });
 
     // Send Email with Reset Password Link
-    const resetLink = `http://localhost:3000/reset-password?token=${token}`;
+    const resetLink = `${process.env.FRONTEND_URL}/reset-password?token=${token}`;
     const mailOptions = {
       from: "umangprajapati19504@gmail.com",
       to: email,
